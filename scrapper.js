@@ -9,17 +9,17 @@ import { compress } from "https://deno.land/x/brotli@v0.1.4/mod.ts"
 /// FETCH DATA
 const inputFileName = "titledb-source.json"
 const url = "https://raw.githubusercontent.com/blawar/titledb/master/GB.en.json"
-console.log("Fetching data from '${url}'...")
+console.log('Fetching data from "${url}"...')
     const fetchedJsonResponse = await fetch(url)
     const fetchedJsonData = await fetchedJsonResponse.json()
 
 /// WRITE FETCHED DATA TO FILE
-console.log("Writing fetched data to '${inputFileName}' file...")
+console.log('Writing fetched data to "${inputFileName}" file...')
     await writeJSON(inputFileName, fetchedJsonData)
 
 /// SCRAP FETCHED DATA
 const jmesQuery = "*.{i:id, n:name, u:iconUrl} | {data:@}"
-console.log("Scrapping '${inputFileName}' file...")
+console.log('Scrapping "${inputFileName}" file...')
     const outputJson = search(fetchedJsonData, jmesQuery)
 
 /// COMPRESS SCRAPPED DATA
@@ -29,6 +29,9 @@ console.log("Compressing data with brotli compression...")
     const outputJsonCompressed = compress(outputJsonBytes)
 
 /// WRITE SCRAPPED FETCHED DATA TO FILE
-const outputFileName = "titledb.bin";
-console.log("Compressing data with brotli compression...")
+const outputFileName = "titledb.bin"
+console.log('Writing scrapped fetched data to "${outputFileName}" file...')
     await writeImage(outputJsonCompressed, outputFileName)
+
+/// FINAL MESSAGE
+console.log("All operations have been performed.")
