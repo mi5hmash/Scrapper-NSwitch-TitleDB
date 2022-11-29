@@ -1,0 +1,38 @@
+name: Scrapper
+
+# on push of (scrapper.yml) into a branch (main), workflow_dispatch or schedule, do...
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/scrapper.yml
+  workflow_dispatch:
+  schedule: # can't be set to more often than every 5 minutes
+    - cron: '1 1,13 * * *' # https://crontab.guru/#1_1,13_*_*_* #At minute 1 past hour 1 and 13.
+
+# ...jobs
+jobs:
+  scheduled:
+    runs-on: ubuntu-latest
+    steps: # 3
+      # 1st Step: Check out the repository so it can read and write the files inside of it.
+      - name: Check out repo
+        uses: actions/checkout@v3
+      # 2nd Step: Install Deno - a new Javascript runtime that improves on Node.
+      - name: Setup deno
+        uses: denoland/setup-deno@main
+        with:
+          deno-version: v1.x
+      # 3rd Step: Fetch and postprocess data according to the script (scrapper.js)
+      - name: Fetch and postprocess data 
+        run: deno run --allow-env --allow-read --allow-write --allow-net scrapper.js
+      # 4th Step:
+      - name: Commit and push if anything changed
+        run: |-
+          git config user.name "scrapper"
+          git config user.email "actions@users.noreply.github.com"
+          git add -A
+          timestamp=$(date -u)
+          git commit -m "Last update: ${timestamp}" || exit 0
+          git push
